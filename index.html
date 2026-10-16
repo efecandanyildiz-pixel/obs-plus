@@ -1,0 +1,1104 @@
+<!doctype html><html><head><meta charset="utf8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>OBS+ — Yaşar Üniversitesi Öğrenci Bilgi Sistemi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#f4f6f9; --surface:#ffffff; --surface-2:#eef1f6;
+    --ink:#14181f; --muted:#5c6673; --rule:#dde2ea;
+    --primary:#2a3eb1; --primary-ink:#ffffff; --primary-soft:#e8eafc;
+    --green:#16a34a; --green-soft:#e9f9ef;
+    --amber:#b45309; --amber-soft:#fff3dd;
+    --red:#dc2626; --red-soft:#fde9e9;
+    --purple:#7c3aed; --purple-soft:#f1eafe;
+    --f-display:"Space Grotesk",system-ui,sans-serif;
+    --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+    --f-body:"IBM Plex Sans",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:15px; line-height:1.5;}
+  a{color:var(--primary); text-decoration:none;}
+  h1,h2,h3{font-family:var(--f-display); margin:0; line-height:1.15;}
+  p{margin:0;}
+  button{font-family:inherit; cursor:pointer;}
+  table{border-collapse:collapse; width:100%;}
+  ::selection{background:var(--primary); color:#fff;}
+
+  .shell{display:grid; grid-template-columns:240px 1fr; min-height:100vh;}
+  .sidebar{background:var(--ink); color:#cfd5e0; padding:16px 0; position:sticky; top:0; height:100vh; overflow-y:auto;}
+  .sidebar .brand{display:flex; align-items:center; gap:10px; padding:4px 18px 18px; font-family:var(--f-display); font-weight:700; font-size:1.1rem; color:#fff;}
+  .sidebar .brand .mark{width:28px; height:28px; background:var(--primary); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;}
+  .sidebar .grp{font-family:var(--f-mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#7b8395; padding:14px 18px 6px;}
+  .sidebar a.navitem{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 18px; font-size:13px; color:#cfd5e0; border-left:3px solid transparent;}
+  .sidebar a.navitem:hover{background:#1e2330; color:#fff;}
+  .sidebar a.navitem.active{background:#1e2330; color:#fff; border-left-color:var(--primary); font-weight:600;}
+  .sidebar a.navitem .mini{font-family:var(--f-mono); font-size:9px; color:#5b6274; border:1px solid #333a4a; padding:1px 5px; border-radius:4px;}
+  .sidebar a.navitem .mini.up{color:#8be38b; border-color:#2f5c37;}
+
+  .main{min-width:0;}
+  .topbar{background:var(--surface); border-bottom:1px solid var(--rule); position:sticky; top:0; z-index:40;}
+  .topbar-inner{padding:13px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px;}
+  .topbar-title{font-family:var(--f-mono); font-size:12px; color:var(--muted);}
+  .topbar-right{display:flex; align-items:center; gap:14px; font-family:var(--f-mono); font-size:12px; color:var(--muted);}
+  .live-pill{display:inline-flex; align-items:center; gap:6px; background:var(--green-soft); color:var(--green); padding:5px 10px; border-radius:20px; font-weight:600;}
+  .live-dot{width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:0.3;}}
+  .profile-chip{display:flex; align-items:center; gap:8px; padding-left:14px; border-left:1px solid var(--rule);}
+  .profile-chip .avatar{width:26px; height:26px; border-radius:50%; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px;}
+  .profile-chip .pinfo{display:flex; flex-direction:column; line-height:1.3;}
+  .profile-chip .pname{color:var(--ink); font-weight:600; font-size:12px;}
+  .profile-chip .pid{font-size:10.5px;}
+
+  .content{padding:20px 24px 60px; max-width:1360px;}
+
+  .kicker{font-family:var(--f-mono); font-size:11.5px; letter-spacing:0.07em; text-transform:uppercase; color:var(--primary); font-weight:600; margin-bottom:6px;}
+  .pagehead{margin-bottom:18px;}
+  .pagehead h1{font-size:1.6rem; margin-bottom:6px;}
+  .pagehead p{color:var(--muted); font-size:0.94rem; max-width:62em;}
+  .improved-badge{display:inline-flex; align-items:center; gap:5px; font-family:var(--f-mono); font-size:10.5px; font-weight:700; background:var(--green-soft); color:var(--green); padding:3px 9px; border-radius:20px; margin-left:10px; vertical-align:middle;}
+
+  .card-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:22px;}
+  .info-card{background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:14px 16px;}
+  .info-card .lbl{font-family:var(--f-mono); font-size:10.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
+  .info-card .row{font-size:13px; margin-bottom:2px;}
+  .info-card .row b{font-weight:600;}
+  .tile-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+  .tile{background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:16px; display:flex; align-items:center; gap:12px;}
+  .tile:hover{border-color:var(--primary);}
+  .tile .ic{width:36px; height:36px; border-radius:9px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:16px; flex:none;}
+  .tile .tt{font-size:13px; font-weight:600;}
+  .tile .ts{font-size:11px; color:var(--muted);}
+
+  .feature-strip{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:18px 0 24px;}
+  .feature-chip{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:11px 13px; font-size:12px;}
+  .feature-chip b{display:block; font-family:var(--f-display); font-size:0.88rem; margin-bottom:2px;}
+  .feature-chip span{color:var(--muted); font-size:11.5px;}
+
+  .banner{border-radius:10px; padding:11px 15px; font-size:13px; margin-bottom:18px; display:flex; gap:10px; align-items:flex-start;}
+  .banner.amber{background:var(--amber-soft); color:var(--amber);}
+  .banner.info{background:var(--primary-soft); color:var(--primary);}
+  .banner b{font-weight:700;}
+
+  .layout{display:grid; grid-template-columns:1fr 400px; gap:20px; align-items:start;}
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;}
+  .tabbtn{font-family:var(--f-mono); font-size:12.5px; font-weight:600; padding:8px 14px; border-radius:20px; border:1px solid var(--rule); background:var(--surface); color:var(--muted);}
+  .tabbtn.on{background:var(--primary); border-color:var(--primary); color:#fff;}
+  .search{flex:1; min-width:180px; padding:9px 13px; border-radius:20px; border:1px solid var(--rule); background:var(--surface); font-family:var(--f-mono); font-size:12.5px;}
+  .search:focus{outline:2px solid var(--primary); outline-offset:1px;}
+  select.sortsel{padding:9px 13px; border-radius:20px; border:1px solid var(--rule); background:var(--surface); font-family:var(--f-mono); font-size:12px;}
+
+  .course-list{display:flex; flex-direction:column; gap:12px;}
+  .course-card{background:var(--surface); border:1px solid var(--rule); border-radius:14px; padding:18px;}
+  .course-card.locked{opacity:0.72;}
+  .course-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;}
+  .course-code{font-family:var(--f-mono); font-size:11.5px; color:var(--muted); font-weight:600;}
+  .course-name{font-family:var(--f-display); font-size:1.08rem; font-weight:700; margin-top:1px;}
+  .tag{display:inline-block; font-family:var(--f-mono); font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:5px; letter-spacing:0.02em; margin-left:8px; vertical-align:middle;}
+  .tag.zorunlu{background:var(--primary-soft); color:var(--primary);}
+  .tag.secmeli{background:var(--purple-soft); color:var(--purple);}
+  .course-meta{font-family:var(--f-mono); font-size:11.5px; color:var(--muted); text-align:right;}
+
+  .prereq-ok{margin-top:10px; font-size:12.5px; color:var(--green); display:flex; gap:6px; align-items:center;}
+  .prereq-bad{margin-top:10px; background:var(--red-soft); color:var(--red); border-radius:8px; padding:9px 12px; font-size:12.5px; display:flex; gap:7px; align-items:flex-start;}
+  .unlock-note{margin-top:8px; background:var(--green-soft); color:var(--green); border-radius:8px; padding:9px 12px; font-size:12.5px; display:flex; gap:7px; align-items:flex-start;}
+  .lock-note{margin-top:8px; background:var(--amber-soft); color:var(--amber); border-radius:8px; padding:9px 12px; font-size:12.5px; display:flex; gap:7px; align-items:flex-start;}
+
+  .sections{margin-top:12px; display:flex; flex-direction:column; gap:8px;}
+  .section-row{border:1px solid var(--rule); border-radius:10px; padding:11px 13px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .section-row.selected{border-color:var(--primary); background:var(--primary-soft);}
+  .section-row.full{background:var(--surface-2);}
+  .section-info{flex:1; min-width:220px;}
+  .section-instr{font-weight:600; font-size:13.5px;}
+  .section-time{font-family:var(--f-mono); font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .avg-chip{font-family:var(--f-mono); font-size:11.5px; font-weight:700; border:1px solid var(--rule); background:var(--surface); padding:4px 9px; border-radius:7px; cursor:pointer;}
+  .avg-chip:hover{border-color:var(--primary); color:var(--primary);}
+  .seat-wrap{width:110px;}
+  .seat-text{font-family:var(--f-mono); font-size:11px; color:var(--muted); display:flex; justify-content:space-between;}
+  .seat-bar{height:5px; border-radius:4px; background:var(--surface-2); margin-top:4px; overflow:hidden;}
+  .seat-fill{height:100%; background:var(--green); transition:width .3s;}
+  .seat-fill.warn{background:var(--amber);}
+  .seat-fill.full{background:var(--red);}
+  .pick-btn{font-family:var(--f-mono); font-size:11.5px; font-weight:700; padding:8px 13px; border-radius:8px; border:1.5px solid var(--primary); background:var(--primary); color:#fff; white-space:nowrap;}
+  .pick-btn.outline{background:transparent; color:var(--primary);}
+  .pick-btn.wait{border-color:var(--amber); background:var(--amber); color:#fff;}
+  .pick-btn.waited{border-color:var(--amber); background:var(--amber-soft); color:var(--amber);}
+  .pick-btn.conflict{border-color:var(--red); background:var(--red); color:#fff; cursor:not-allowed;}
+  .pick-btn:disabled{opacity:0.55; cursor:not-allowed;}
+
+  .avg-pop{margin-top:10px; border-top:1px dashed var(--rule); padding-top:10px; font-size:12px; flex-basis:100%;}
+  .avg-bars{display:flex; align-items:flex-end; gap:5px; height:60px; margin:8px 0;}
+  .avg-bars div{flex:1; background:var(--primary); border-radius:3px 3px 0 0; position:relative;}
+  .avg-bars span{position:absolute; top:-15px; left:0; right:0; text-align:center; font-family:var(--f-mono); font-size:9.5px; color:var(--muted);}
+  .avg-labels{display:flex; gap:5px; font-family:var(--f-mono); font-size:9.5px; color:var(--muted); text-align:center;}
+  .avg-labels div{flex:1;}
+  .avg-stats{display:flex; gap:16px; margin-top:8px; font-family:var(--f-mono); font-size:11px; color:var(--muted); flex-wrap:wrap;}
+  .avg-stats b{color:var(--ink);}
+
+  .panel-sticky{position:sticky; top:72px; display:flex; flex-direction:column; gap:14px;}
+  .panel{background:var(--surface); border:1px solid var(--rule); border-radius:14px; padding:16px;}
+  .panel h3{font-size:0.95rem; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;}
+  .legend{display:flex; gap:10px; flex-wrap:wrap; font-family:var(--f-mono); font-size:10px; color:var(--muted); margin-top:8px;}
+  .legend span{display:inline-flex; align-items:center; gap:4px;}
+  .legend i{width:9px; height:9px; border-radius:2px; display:inline-block;}
+
+  .grid-wrap{overflow-x:auto;}
+  table.sched{border-collapse:collapse; width:100%; font-size:10.5px;}
+  table.sched th{font-family:var(--f-mono); font-weight:600; color:var(--muted); font-size:10px; padding:4px 2px; border-bottom:1px solid var(--rule);}
+  table.sched td{border:1px solid var(--rule); height:34px; width:60px; vertical-align:top; padding:1px;}
+  table.sched td.hour{font-family:var(--f-mono); font-size:9.5px; color:var(--muted); border:0; text-align:right; padding-right:4px; width:34px;}
+  .slot{height:100%; border-radius:4px; padding:2px 4px; font-size:9px; line-height:1.2; color:#fff; overflow:hidden;}
+  .slot.zorunlu{background:var(--primary);}
+  .slot.secmeli{background:var(--purple);}
+  .slot.conflict{background:var(--red);}
+
+  .summary-row{display:flex; justify-content:space-between; font-family:var(--f-mono); font-size:11.5px; padding:5px 0; border-bottom:1px dashed var(--rule);}
+  .summary-row:last-child{border-bottom:0;}
+  .akts-bar{height:7px; border-radius:4px; background:var(--surface-2); margin:8px 0 4px; overflow:hidden;}
+  .akts-fill{height:100%; background:var(--primary);}
+
+  .data-card{background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:18px; margin-bottom:16px;}
+  .data-card h3{font-size:1rem; margin-bottom:2px;}
+  .data-card .sub{font-family:var(--f-mono); font-size:11px; color:var(--muted); margin-bottom:12px;}
+  table.datatable th{text-align:left; font-family:var(--f-mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.03em; padding:7px 8px; border-bottom:1px solid var(--rule);}
+  table.datatable td{padding:7px 8px; font-size:13px; border-bottom:1px solid var(--surface-2);}
+  table.datatable tr:last-child td{border-bottom:0;}
+  table.datatable td.fail{color:var(--red); font-weight:600;}
+  table.datatable td.num{font-family:var(--f-mono); text-align:right;}
+  .stat-pills{display:flex; gap:14px; flex-wrap:wrap; font-family:var(--f-mono); font-size:11.5px; color:var(--muted);}
+  .stat-pills b{color:var(--ink); font-size:13px;}
+  .badge-status{font-family:var(--f-mono); font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:20px;}
+  .badge-status.ok{background:var(--green-soft); color:var(--green);}
+  .badge-status.warn{background:var(--amber-soft); color:var(--amber);}
+  .insight-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  .insight{flex:1; min-width:180px; background:var(--surface-2); border-radius:10px; padding:12px 14px;}
+  .insight .lbl{font-family:var(--f-mono); font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:4px;}
+  .insight b{font-size:1.1rem; font-family:var(--f-display);}
+
+  .gno-chart{display:flex; align-items:flex-end; gap:10px; height:140px; margin:18px 0 6px; padding:0 4px;}
+  .gno-chart .bar{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+  .gno-chart .fill{width:100%; background:var(--primary); border-radius:5px 5px 0 0; position:relative;}
+  .gno-chart .fill.best{background:var(--green);}
+  .gno-chart .fill.worst{background:var(--red);}
+  .gno-chart .fill b{position:absolute; top:-18px; left:0; right:0; text-align:center; font-family:var(--f-mono); font-size:10.5px; color:var(--ink);}
+  .gno-chart .lbl{margin-top:6px; font-family:var(--f-mono); font-size:9.5px; color:var(--muted); text-align:center;}
+
+  .cal-table td, .cal-table th{padding:8px 10px; font-size:12.5px;}
+  .cal-table th{text-align:left; font-family:var(--f-mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; border-bottom:1px solid var(--rule);}
+  .cal-table td{border-bottom:1px solid var(--surface-2);}
+  .cal-table td.when{font-family:var(--f-mono); color:var(--muted); white-space:nowrap;}
+  .cal-table tr.active-now{background:var(--green-soft);}
+  .cal-table tr.soon{background:var(--amber-soft);}
+  .countdown-chip{font-family:var(--f-mono); font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:20px; white-space:nowrap;}
+  .countdown-chip.now{background:var(--green); color:#fff;}
+  .countdown-chip.soon{background:var(--amber); color:#fff;}
+  .countdown-chip.later{background:var(--surface-2); color:var(--muted);}
+  .countdown-chip.past{background:var(--surface-2); color:var(--muted); opacity:0.6;}
+
+  .placeholder-card{background:var(--surface); border:1px dashed var(--rule); border-radius:14px; padding:40px; text-align:center; color:var(--muted);}
+  .placeholder-card .ic{font-size:2rem; margin-bottom:10px;}
+
+  .exam-card{background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:16px; margin-bottom:10px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .exam-card.conflict{border-color:var(--red); background:var(--red-soft);}
+  .exam-date{font-family:var(--f-display); font-weight:700; font-size:1.3rem; min-width:90px;}
+  .exam-date span{display:block; font-family:var(--f-mono); font-size:10px; color:var(--muted); font-weight:400;}
+  .exam-info{flex:1; min-width:200px;}
+  .exam-info .nm{font-weight:600;}
+  .exam-info .mt{font-family:var(--f-mono); font-size:11.5px; color:var(--muted); margin-top:2px;}
+
+  .att-card{background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:16px; margin-bottom:10px;}
+  .att-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;}
+  .att-bar{height:8px; border-radius:5px; background:var(--surface-2); overflow:hidden;}
+  .att-fill{height:100%; background:var(--green);}
+  .att-fill.warn{background:var(--amber);}
+  .att-fill.danger{background:var(--red);}
+
+  .toast-wrap{position:fixed; bottom:18px; right:18px; z-index:100; display:flex; flex-direction:column; gap:8px; max-width:320px;}
+  .toast{background:var(--ink); color:#fff; padding:11px 14px; border-radius:10px; font-size:12.5px; box-shadow:0 8px 20px rgba(0,0,0,0.18); animation:slidein .25s ease;}
+  .toast.good{background:var(--green);}
+  .toast.warn{background:var(--amber);}
+  @keyframes slidein{from{transform:translateX(30px); opacity:0;} to{transform:translateX(0); opacity:1;}}
+
+  .req-tile{display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:14px 16px; margin-bottom:10px;}
+  .req-tile .ic{width:38px; height:38px; border-radius:10px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:16px; flex:none;}
+  .req-tile .tt{font-weight:600; font-size:13.5px;}
+  .req-tile .ts{font-size:12px; color:var(--muted); margin-top:1px;}
+  .req-tile .st{margin-left:auto;}
+
+  footer{text-align:center; padding:30px 0 10px; color:var(--muted); font-family:var(--f-mono); font-size:11px;}
+
+  @media (max-width:1060px){
+    .shell{grid-template-columns:1fr;}
+    .sidebar{position:static; height:auto;}
+    .layout{grid-template-columns:1fr;}
+    .feature-strip{grid-template-columns:repeat(2,1fr);}
+    .card-grid, .tile-grid{grid-template-columns:repeat(2,1fr);}
+    .panel-sticky{position:static;}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="sidebar" id="sidebar"></nav>
+  <div class="main">
+    <div class="topbar"><div class="topbar-inner">
+      <span class="topbar-title" id="topbarTitle">Öğrenci Bilgi Sistemi</span>
+      <div class="topbar-right">
+        <span class="live-pill"><span class="live-dot"></span>Canlı</span>
+        <span id="clock"></span>
+        <div class="profile-chip">
+          <div class="avatar">E*</div>
+          <div class="pinfo">
+            <span class="pname">E***** D********</span>
+            <span class="pid">Ö.No: 210••••••27 · T.C.: 453••••••16</span>
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <div class="content" id="content"></div>
+    <footer>OBS+ — Bitirme ödevi prototipi · gerçek kayıt işlemi yapmaz, OBS'ten alınan gerçek (kimliği maskelenmiş) verilerle çalışır</footer>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+(function(){
+
+  var TODAY = new Date(); // uses the real current date
+
+  // =====================================================================
+  // Shared student data (identity masked — real academic data from OBS)
+  // =====================================================================
+  var STU = {
+    program:"Enerji Sistemleri Mühendisliği", fakulte:"Mühendislik Fakültesi",
+    kayitTarihi:"28.01.2022", danisman:"Dr. Öğr. Üyesi Emrah Bıyık",
+    agno:1.80, donem:9, normalSure:4, azamiSure:7,
+    toplamAkts:184, hedefAkts:240,
+    alinanKredi:71, basariliKredi:64, basariliAkts:152,
+    not_:"2021-2022 Bahar döneminde Manisa Celal Bayar Üniversitesi'nden yatay geçişle geldi.",
+    danismanOnay:"Onaylandı"
+  };
+
+  var NAV = [
+    {grp:"Genel", items:[
+      {id:"anasayfa", label:"Anasayfa", icon:"🏠"},
+      {id:"akademik-takvim", label:"Akademik Takvim", icon:"📅", up:true},
+      {id:"sinav-takvimi", label:"Sınav Takvimi", icon:"📝", up:true},
+      {id:"danisman", label:"Danışman Bilgileri", icon:"🧑‍🏫", up:true}
+    ]},
+    {grp:"Ders ve Dönem İşlemleri", items:[
+      {id:"ders-kayit", label:"Ders Kayıt", icon:"🗂️", up:true, highlight:true},
+      {id:"ders-ekle-birak", label:"Ders Ekle / Bırak", icon:"🔁", up:true},
+      {id:"ders-programi", label:"Ders Programı", icon:"🗓️", up:true},
+      {id:"donem-ortalamalari", label:"Dönem Ortalamaları", icon:"📊", up:true},
+      {id:"not-listesi", label:"Not Listesi", icon:"📋", up:true},
+      {id:"transkript", label:"Transkript", icon:"📜", up:true},
+      {id:"mufredat-durum", label:"Müfredat Durum", icon:"🧭", up:true},
+      {id:"devamsizlik", label:"Devamsızlık Durumu", icon:"⏱️", up:true}
+    ]},
+    {grp:"Başvurular", items:[
+      {id:"basvuru-islemleri", label:"Başvuru İşlemleri", icon:"📨", up:true},
+      {id:"belge-talebi", label:"Belge Talebi", icon:"📄", up:true}
+    ]},
+    {grp:"Hesap", items:[
+      {id:"kullanici-islemleri", label:"Kullanıcı İşlemleri", icon:"⚙️"}
+    ]}
+  ];
+  var PAGE_TITLES = {};
+  NAV.forEach(function(g){ g.items.forEach(function(it){ PAGE_TITLES[it.id]=it.label; }); });
+
+  function toast(msg, cls){
+    var wrap = document.getElementById("toastWrap");
+    var el = document.createElement("div");
+    el.className = "toast" + (cls? " "+cls : "");
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(function(){ el.remove(); }, 4200);
+  }
+  function improvedBadge(){ return '<span class="improved-badge">✓ OBS\'ten iyileştirildi</span>'; }
+
+  function renderSidebar(route){
+    var el = document.getElementById("sidebar");
+    var html = '<div class="brand"><span class="mark">+</span>OBS+</div>';
+    NAV.forEach(function(g){
+      html += '<div class="grp">'+g.grp+'</div>';
+      g.items.forEach(function(it){
+        var on = route===it.id;
+        html += '<a class="navitem'+(on?" active":"")+'" href="#/'+it.id+'">'+
+                '<span>'+it.icon+' '+it.label+'</span>'+
+                (it.up? '<span class="mini up">✓</span>' : '<span class="mini">OBS</span>') +
+                '</a>';
+      });
+    });
+    el.innerHTML = html;
+  }
+
+  // =====================================================================
+  // Date helpers (real countdown logic)
+  // =====================================================================
+  function parseTR(d){ var p=d.split("."); return new Date(+p[2], +p[1]-1, +p[0]); }
+  function dayDiff(d){ return Math.round((d - new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate())) / 86400000); }
+  function fmtTR(d){ return d.toLocaleDateString("tr-TR"); }
+
+  // =====================================================================
+  // DASHBOARD
+  // =====================================================================
+  function renderDashboard(){
+    var pct = Math.round(STU.toplamAkts/STU.hedefAkts*100);
+    return ''+
+    '<div class="pagehead"><div class="kicker">'+STU.program+' · 2026-2027 Güz</div><h1>Anasayfa</h1>'+
+    '<p>OBS\'teki panonun aynısı — OBS+ üzerinde, hemen hemen her sayfa gerçek verinle yeniden tasarlandı.</p></div>'+
+    '<div class="card-grid">'+
+      infoCard("Program Bilgisi", [["Program", STU.program], ["Fakülte", STU.fakulte], ["Kayıt Tarihi", STU.kayitTarihi]]) +
+      infoCard("Öğrenim Durumu", [["Durum","Kayıt Yenileme"],["AGNO", STU.agno.toFixed(2)],["Dönem / Sınıf", STU.donem+" / 4"]]) +
+      infoCard("Süre Bilgisi", [["Okuduğu Dönem", STU.donem],["Normal Süre", STU.normalSure+" yıl"],["Azami Süre", STU.azamiSure+" yıl"]]) +
+      infoCard("Danışman", [["Danışman", STU.danisman],["Onay Durumu", STU.danismanOnay],["Bölüm", STU.program]]) +
+    '</div>'+
+    '<div class="data-card">'+
+      '<h3>Mezuniyet İlerlemesi</h3><div class="sub">Toplam AKTS '+STU.toplamAkts+' / '+STU.hedefAkts+'</div>'+
+      '<div class="akts-bar" style="height:10px;"><div class="akts-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="stat-pills" style="margin-top:8px;"><span><b>%'+pct+'</b> tamamlandı</span><span>'+STU.not_+'</span></div>'+
+    '</div>'+
+    '<h3 style="margin-bottom:12px;">Hızlı Erişim</h3>'+
+    '<div class="tile-grid">'+
+      tile("ders-kayit","🗂️","Ders Kayıt","5 akıllı özellik ile") +
+      tile("ders-programi","🗓️","Ders Programı","Bu dönemin programı") +
+      tile("mufredat-durum","🧭","Müfredat Durum","Mezuniyet yol haritası") +
+      tile("sinav-takvimi","📝","Sınav Takvimi","Çakışma kontrolü ile") +
+      tile("transkript","📜","Transkript","Aranabilir, filtrelenebilir") +
+      tile("donem-ortalamalari","📊","Dönem Ortalamaları","GNO/DNO grafiği") +
+      tile("devamsizlik","⏱️","Devamsızlık Durumu","Risk göstergeli") +
+      tile("akademik-takvim","📅","Akademik Takvim","Geri sayımlı") +
+    '</div>';
+  }
+  function infoCard(lbl, rows){
+    var html = '<div class="info-card"><div class="lbl">'+lbl+'</div>';
+    rows.forEach(function(r){ html += '<div class="row">'+r[0]+': <b>'+r[1]+'</b></div>'; });
+    return html+'</div>';
+  }
+  function tile(id, ic, tt, ts){
+    return '<a class="tile" href="#/'+id+'"><div class="ic">'+ic+'</div><div><div class="tt">'+tt+'</div><div class="ts">'+ts+'</div></div></a>';
+  }
+
+  // =====================================================================
+  // DERS KAYIT / DERS EKLE-BIRAK (shared registration engine — 5 upgraded features)
+  // =====================================================================
+  var DAYS = ["Pzt","Sal","Çar","Per","Cum","Cmt"];
+  var HOURS = [8,9,10,11,12,13,14,15,16,17];
+  function slots(arr){ return arr.map(function(s){ return {day:s[0], start:s[1], end:s[2]}; }); }
+
+  var courses = [
+    {code:"EEE 3718", name:"Geri Besleme Sistemleri", type:"zorunlu", akts:6,
+      prereq:["EEE 203"], unlocks:["EEE 405 Kontrol Sistemleri Tasarımı"],
+      sections:[
+        {id:"eee3718-1", instr:"Dr. Öğr. Üyesi Emrah Bıyık", room:"M528", slots:slots([["Pzt","10:40","13:30"]]), cap:60, enrolled:46,
+         hist:[{aa:10,ba:12,bb:14,cb:11,cc:9,dc:5,dd:3,ff:2,avg:2.66,sem:"2025-26 Güz"},{avg:2.51,sem:"2024-25 Güz"},{avg:2.60,sem:"2023-24 Güz"}]},
+        {id:"eee3718-2", instr:"Doç. Dr. Seda Kılıç", room:"M204", slots:slots([["Çar","13:00","16:00"]]), cap:50, enrolled:37,
+         hist:[{aa:14,ba:16,bb:12,cb:8,cc:6,dc:3,dd:2,ff:1,avg:3.02,sem:"2025-26 Güz"},{avg:2.88,sem:"2024-25 Güz"},{avg:2.95,sem:"2023-24 Güz"}]}
+      ]},
+    {code:"ME 3320", name:"Isı ve Kütle Transferi", type:"zorunlu", akts:6,
+      prereq:["ME 2320"], unlocks:["ME 4410 Enerji Sistemleri Tasarımı"],
+      sections:[
+        {id:"me3320-1", instr:"Dr. Öğr. Üyesi Levent Bilir", room:"M113", slots:slots([["Pzt","13:40","16:30"],["Cum","08:40","10:30"]]), cap:60, enrolled:52,
+         hist:[{aa:8,ba:10,bb:15,cb:14,cc:10,dc:6,dd:4,ff:3,avg:2.34,sem:"2025-26 Güz"},{avg:2.21,sem:"2024-25 Güz"},{avg:2.40,sem:"2023-24 Güz"}]}
+      ]},
+    {code:"ME 2320", name:"Termodinamik", type:"zorunlu", akts:6,
+      prereq:[], unlocks:["ME 3320 Isı ve Kütle Transferi","ESE 4910 Enerji Sistemleri Analizi"],
+      sections:[
+        {id:"me2320-1", instr:"Prof. Dr. Nurdan Yıldırım", room:"M109 / M216", slots:slots([["Sal","12:40","15:30"],["Per","12:40","14:30"]]), cap:87, enrolled:81,
+         hist:[{aa:12,ba:18,bb:20,cb:15,cc:10,dc:6,dd:3,ff:3,avg:2.71,sem:"2025-26 Güz"},{avg:2.65,sem:"2024-25 Güz"},{avg:2.58,sem:"2023-24 Güz"}]}
+      ]},
+    {code:"ESE 4910", name:"Enerji Sistemleri Analizi", type:"zorunlu", akts:8,
+      prereq:["ME 2320"], unlocks:["Mezuniyet projesi"],
+      sections:[
+        {id:"ese4910-1", instr:"Dr. Öğr. Üyesi Selen Çekinir", room:"M534 / M109", slots:slots([["Per","12:40","13:30"],["Cmt","12:40","16:30"]]), cap:65, enrolled:62,
+         hist:[{aa:9,ba:11,bb:13,cb:12,cc:9,dc:6,dd:4,ff:2,avg:2.49,sem:"2025-26 Güz"},{avg:2.33,sem:"2024-25 Güz"}]}
+      ]},
+    {code:"ENGR 4451", name:"Mühendislik Uygulamaları İçin Üretken Yapay Zeka", type:"secmeli", akts:6,
+      prereq:[], unlocks:[],
+      sections:[
+        {id:"engr4451-1", instr:"Doç. Dr. Orkun Karabaşoğlu", room:"M531", slots:slots([["Cum","11:40","14:30"]]), cap:41, enrolled:41,
+         hist:[{aa:20,ba:12,bb:6,cb:2,cc:1,dc:0,dd:0,ff:0,avg:3.58,sem:"2025-26 Güz"}]}
+      ]},
+    {code:"EEE 350", name:"Yenilenebilir Enerji Sistemleri", type:"secmeli", akts:5,
+      prereq:["EEE 203"], unlocks:[],
+      sections:[
+        {id:"eee350-1", instr:"Dr. Öğr. Üyesi Pınar Aksoy", room:"M312", slots:slots([["Sal","09:40","12:30"]]), cap:40, enrolled:18,
+         hist:[{aa:11,ba:10,bb:9,cb:6,cc:4,dc:2,dd:1,ff:1,avg:2.95,sem:"2025-26 Güz"},{avg:2.80,sem:"2024-25 Güz"}]},
+        {id:"eee350-2", instr:"Prof. Dr. Cem Türkmen", room:"M118", slots:slots([["Per","09:40","12:30"]]), cap:40, enrolled:39,
+         hist:[{aa:6,ba:9,bb:12,cb:10,cc:7,dc:4,dd:2,ff:2,avg:2.52,sem:"2025-26 Güz"},{avg:2.44,sem:"2024-25 Güz"}]}
+      ]},
+    {code:"ENGR 302", name:"Mühendislikte Proje Yönetimi", type:"secmeli", akts:5,
+      prereq:[], unlocks:[],
+      sections:[
+        {id:"engr302-1", instr:"Öğr. Gör. Dr. Baran Ersoy", room:"M220", slots:slots([["Çar","10:40","13:30"]]), cap:50, enrolled:33,
+         hist:[{aa:15,ba:14,bb:10,cb:5,cc:3,dc:1,dd:1,ff:0,avg:3.21,sem:"2025-26 Güz"}]}
+      ]},
+    {code:"MATH 310", name:"Mühendisler için İstatistik", type:"secmeli", akts:5,
+      prereq:["MATH 211"], unlocks:[],
+      sections:[
+        {id:"math310-1", instr:"Dr. Öğr. Üyesi Elif Korkmaz", room:"M150", slots:slots([["Pzt","09:40","12:30"]]), cap:55, enrolled:50,
+         hist:[{aa:9,ba:13,bb:14,cb:9,cc:6,dc:3,dd:2,ff:1,avg:2.78,sem:"2025-26 Güz"}]}
+      ]}
+  ];
+  var completedCourses = ["EEE 203","MATH 211","MATH 102","PHYS 102"];
+  var selected = {}, waitlisted = {}, curFilter = "tumu", curSearch = "";
+  var registrationTimer = null;
+
+  function renderDersKayitShell(isEkleBirak){
+    var deadline = parseTR("09.10.2026");
+    var dleft = dayDiff(deadline);
+    var banner = isEkleBirak ?
+      '<div class="banner '+(dleft<=5?"amber":"info")+'"><b>⏳ Ekle/Bırak son günü:</b>&nbsp; 09.10.2026'+(dleft>=0? " — "+dleft+" gün kaldı" : " — süre doldu")+'. OBS bu geri sayımı hiçbir yerde göstermiyor.</div>'
+      : '';
+    return banner+''+
+    '<div class="pagehead"><div class="kicker">'+STU.program+' · 2026-2027 Güz</div><h1>'+(isEkleBirak?"Ders Ekle / Bırak":"Ders Kayıt")+improvedBadge()+'</h1>'+
+    '<p>OBS\'in mevcut ders kayıt ekranı sade bir tablo; çakışma, kontenjan ve hoca bilgisi için ayrı sayfalara geçmen gerekiyor. Burada beşi de aynı ekranda, canlı.</p></div>'+
+    '<div class="feature-strip">'+
+      '<div class="feature-chip"><b>📅 Canlı Program</b><span>Seçtiğin an haritada</span></div>'+
+      '<div class="feature-chip"><b>⚠️ Çakışma Tespiti</b><span>Üst üste binen ders engellenir</span></div>'+
+      '<div class="feature-chip"><b>🔒 Önkoşul/Kilit</b><span>Almazsan ne kilitlenir?</span></div>'+
+      '<div class="feature-chip"><b>👥 Canlı Kontenjan</b><span>+ otomatik bekleme listesi</span></div>'+
+      '<div class="feature-chip"><b>📊 Hoca Ortalaması</b><span>Not dağılımı + geçmiş</span></div>'+
+    '</div>'+
+    '<div class="layout">'+
+      '<div>'+
+        '<div class="toolbar">'+
+          '<button class="tabbtn on" data-filter="tumu">Tümü</button>'+
+          '<button class="tabbtn" data-filter="zorunlu">Zorunlu</button>'+
+          '<button class="tabbtn" data-filter="secmeli">Seçmeli</button>'+
+          '<input class="search" id="searchBox" placeholder="Ders kodu veya adı ara...">'+
+        '</div>'+
+        '<div class="course-list" id="courseList"></div>'+
+      '</div>'+
+      '<div class="panel-sticky">'+
+        '<div class="panel"><h3>Haftalık Program</h3><div class="grid-wrap"><table class="sched" id="schedTable"></table></div>'+
+          '<div class="legend"><span><i style="background:var(--primary)"></i>Zorunlu</span><span><i style="background:var(--purple)"></i>Seçmeli</span><span><i style="background:var(--red)"></i>Çakışma</span></div>'+
+        '</div>'+
+        '<div class="panel"><h3>Seçilen Dersler</h3><div id="summaryBody" style="font-family:var(--f-mono); font-size:11.5px; color:var(--muted);">Henüz ders seçmedin.</div>'+
+          '<div class="akts-bar"><div class="akts-fill" id="aktsFill" style="width:0%"></div></div>'+
+          '<div class="summary-row"><span>Toplam AKTS</span><b id="aktsText">0 / 30</b></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  function toMin(t){ var p=t.split(":"); return (+p[0])*60+(+p[1]); }
+  function prereqMet(course){ return course.prereq.every(function(p){ return completedCourses.indexOf(p)!==-1; }); }
+  function conflictsWith(a,b){
+    for(var i=0;i<a.length;i++) for(var j=0;j<b.length;j++)
+      if(a[i].day===b[j].day && toMin(a[i].start)<toMin(b[j].end) && toMin(b[j].start)<toMin(a[i].end)) return true;
+    return false;
+  }
+  function findConflict(section){
+    for(var id in selected) if(conflictsWith(section.slots, selected[id].section.slots)) return selected[id];
+    return null;
+  }
+  function seatColor(remaining, cap){ if(remaining<=0) return "full"; if(remaining/cap<0.15) return "warn"; return ""; }
+
+  function courseMatches(c){
+    if(curFilter!=="tumu" && c.type!==curFilter) return false;
+    if(curSearch){ var q=curSearch.toLowerCase(); if(c.code.toLowerCase().indexOf(q)===-1 && c.name.toLowerCase().indexOf(q)===-1) return false; }
+    return true;
+  }
+
+  function renderList(){
+    var listEl = document.getElementById("courseList");
+    if(!listEl) return;
+    listEl.innerHTML = "";
+    courses.filter(courseMatches).forEach(function(c){
+      var met = prereqMet(c);
+      var card = document.createElement("div");
+      card.className = "course-card" + (met? "" : " locked");
+      var head = document.createElement("div");
+      head.className = "course-head";
+      head.innerHTML = '<div><div class="course-code">'+c.code+'<span class="tag '+c.type+'">'+(c.type==="zorunlu"?"ZORUNLU":"SEÇMELİ")+'</span></div>'+
+        '<div class="course-name">'+c.name+'</div></div><div class="course-meta">'+c.akts+' AKTS</div>';
+      card.appendChild(head);
+      if(met){
+        var ok = document.createElement("div"); ok.className="prereq-ok";
+        ok.innerHTML = "✓ " + (c.prereq.length? "Önkoşul sağlandı: "+c.prereq.join(", ") : "Önkoşul yok");
+        card.appendChild(ok);
+      } else {
+        var bad = document.createElement("div"); bad.className="prereq-bad";
+        bad.innerHTML = "🔒 <div><b>Önkoşul eksik:</b> "+c.prereq.join(", ")+" tamamlanmadan bu ders alınamaz.</div>";
+        card.appendChild(bad);
+      }
+      if(met && c.unlocks.length){
+        var un = document.createElement("div"); un.className="unlock-note";
+        un.innerHTML = "✓ Bu dersi alırsan önü açılır: " + c.unlocks.join(", ");
+        card.appendChild(un);
+      }
+      if(met && c.type==="zorunlu" && !c.sections.some(function(s){return selected[s.id];})){
+        var lk = document.createElement("div"); lk.className="lock-note";
+        lk.innerHTML = "⏳ Bu dönem almazsan: mezuniyetin en az 1 dönem gecikebilir.";
+        card.appendChild(lk);
+      }
+      var secWrap = document.createElement("div"); secWrap.className="sections";
+      c.sections.forEach(function(s){ secWrap.appendChild(renderSection(c,s,met)); });
+      card.appendChild(secWrap);
+      listEl.appendChild(card);
+    });
+    if(!listEl.children.length) listEl.innerHTML = '<div style="color:var(--muted); font-family:var(--f-mono); font-size:13px; padding:20px;">Eşleşen ders bulunamadı.</div>';
+  }
+
+  function renderSection(course, s, prereqOk){
+    var row = document.createElement("div");
+    var remaining = s.cap - s.enrolled;
+    var isSel = !!selected[s.id], isWaited = !!waitlisted[s.id];
+    row.className = "section-row" + (isSel?" selected":"") + (remaining<=0 && !isSel?" full":"");
+    var info = document.createElement("div"); info.className="section-info";
+    var timeStr = s.slots.map(function(sl){ return sl.day+" "+sl.start+"-"+sl.end; }).join(" · ");
+    info.innerHTML = '<div class="section-instr">'+s.instr+'</div><div class="section-time">'+timeStr+' · '+s.room+'</div>';
+    row.appendChild(info);
+    var avgBtn = document.createElement("button"); avgBtn.className="avg-chip";
+    avgBtn.textContent = "Ort. " + s.hist[0].avg.toFixed(2) + " ▾";
+    avgBtn.addEventListener("click", function(){
+      var existing = row.querySelector(".avg-pop");
+      if(existing){ existing.remove(); return; }
+      row.appendChild(renderAvgPop(s));
+    });
+    row.appendChild(avgBtn);
+    var seatWrap = document.createElement("div"); seatWrap.className="seat-wrap";
+    var cls = seatColor(remaining, s.cap);
+    seatWrap.innerHTML = '<div class="seat-text"><span>Kalan '+Math.max(remaining,0)+'</span><span>'+s.enrolled+'/'+s.cap+'</span></div>'+
+      '<div class="seat-bar"><div class="seat-fill '+cls+'" style="width:'+Math.max(0,(remaining/s.cap*100))+'%"></div></div>';
+    row.appendChild(seatWrap);
+    var btn = document.createElement("button");
+    if(!prereqOk){ btn.className="pick-btn outline"; btn.textContent="Kilitli"; btn.disabled=true; }
+    else if(isSel){ btn.className="pick-btn outline"; btn.textContent="Çıkar"; btn.addEventListener("click", function(){ removeSection(s); }); }
+    else if(isWaited){ btn.className="pick-btn waited"; btn.textContent="Listede bekliyor ✓";
+      btn.addEventListener("click", function(){ delete waitlisted[s.id]; toast("Bekleme listesinden çıkarıldın: "+course.code,"warn"); renderAll(); }); }
+    else {
+      var conflict = findConflict(s);
+      if(conflict){ btn.className="pick-btn conflict"; btn.textContent="Çakışıyor"; btn.title=conflict.course.code+" ile çakışıyor";
+        btn.addEventListener("click", function(){ toast(course.code+" seçilemedi: "+conflict.course.code+" ile çakışıyor.","warn"); }); }
+      else if(remaining<=0){ btn.className="pick-btn wait"; btn.textContent="Bekleme Listesi";
+        btn.addEventListener("click", function(){ waitlisted[s.id]=true; toast("Bekleme listesine eklendin: "+course.code+" — yer açılınca otomatik kaydolursun."); renderAll(); }); }
+      else { btn.className="pick-btn"; btn.textContent="Seç"; btn.addEventListener("click", function(){ addSection(course,s); }); }
+    }
+    row.appendChild(btn);
+    return row;
+  }
+
+  function renderAvgPop(s){
+    var h = s.hist[0]; var keys=["aa","ba","bb","cb","cc","dc","dd","ff"];
+    var max = Math.max.apply(null, keys.map(function(k){ return h[k]||0; }));
+    var pop = document.createElement("div"); pop.className="avg-pop";
+    var barsHtml = '<div class="avg-bars">';
+    keys.forEach(function(k){ var v=h[k]||0; var pct=max?(v/max*100):0; barsHtml += '<div style="height:'+pct+'%"><span>'+v+'</span></div>'; });
+    barsHtml += '</div><div class="avg-labels">'+keys.map(function(k){return '<div>'+k.toUpperCase()+'</div>';}).join("")+'</div>';
+    var histHtml = '<div class="avg-stats">'+s.hist.map(function(x){ return '<span>'+x.sem+': <b>'+x.avg.toFixed(2)+'</b></span>'; }).join("")+'</div>';
+    pop.innerHTML = barsHtml + histHtml;
+    return pop;
+  }
+
+  function addSection(course,s){
+    var conflict = findConflict(s);
+    if(conflict){ toast(course.code+" seçilemedi: çakışma var.","warn"); return; }
+    selected[s.id] = {course:course, section:s}; s.enrolled++;
+    toast(course.code+" ("+s.instr.split(" ").slice(-1)[0]+") programa eklendi.","good");
+    renderAll();
+  }
+  function removeSection(s){
+    var entry = selected[s.id]; if(!entry) return;
+    delete selected[s.id]; s.enrolled = Math.max(0,s.enrolled-1);
+    toast(entry.course.code+" programdan çıkarıldı."); renderAll();
+  }
+
+  function renderSchedule(){
+    var schedEl = document.getElementById("schedTable"); if(!schedEl) return;
+    var html = "<tr><th></th>" + DAYS.map(function(d){return "<th>"+d+"</th>";}).join("") + "</tr>";
+    var cellMap = {};
+    Object.keys(selected).forEach(function(id){
+      var entry = selected[id];
+      entry.section.slots.forEach(function(sl){
+        var startH = Math.floor(toMin(sl.start)/60), endH = Math.ceil(toMin(sl.end)/60);
+        for(var h=startH; h<endH; h++){ var key=sl.day+"-"+h; if(!cellMap[key]) cellMap[key]=[]; cellMap[key].push(entry); }
+      });
+    });
+    HOURS.forEach(function(h){
+      html += "<tr><td class='hour'>"+h+":00</td>";
+      DAYS.forEach(function(d){
+        var items = cellMap[d+"-"+h];
+        if(items && items.length){
+          var conflict = items.length>1, entry = items[0], cls = conflict?"conflict":entry.course.type;
+          html += "<td><div class='slot "+cls+"'>"+entry.course.code+(conflict?" ⚠":"")+"</div></td>";
+        } else html += "<td></td>";
+      });
+      html += "</tr>";
+    });
+    schedEl.innerHTML = html;
+  }
+
+  function renderSummary(){
+    var body = document.getElementById("summaryBody"); if(!body) return;
+    var ids = Object.keys(selected), totalAkts = 0;
+    if(!ids.length) body.innerHTML = "Henüz ders seçmedin.";
+    else body.innerHTML = ids.map(function(id){ var e=selected[id]; totalAkts+=e.course.akts;
+      return '<div class="summary-row"><span>'+e.course.code+'</span><b>'+e.course.akts+' AKTS</b></div>'; }).join("");
+    var pct = Math.min(100, totalAkts/30*100);
+    document.getElementById("aktsFill").style.width = pct+"%";
+    document.getElementById("aktsText").textContent = totalAkts + " / 30";
+  }
+
+  function renderAll(){ renderList(); renderSchedule(); renderSummary(); }
+
+  function initDersKayit(){
+    document.querySelectorAll(".tabbtn").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        document.querySelectorAll(".tabbtn").forEach(function(b){b.classList.remove("on");});
+        btn.classList.add("on"); curFilter = btn.dataset.filter; renderList();
+      });
+    });
+    var sb = document.getElementById("searchBox");
+    if(sb) sb.addEventListener("input", function(e){ curSearch = e.target.value; renderList(); });
+    renderAll();
+    if(registrationTimer) clearInterval(registrationTimer);
+    registrationTimer = setInterval(function(){
+      var allSections = []; courses.forEach(function(c){ c.sections.forEach(function(s){ allSections.push(s); }); });
+      var free = allSections.filter(function(s){ return !selected[s.id]; });
+      if(!free.length) return;
+      var s = free[Math.floor(Math.random()*free.length)];
+      var remaining = s.cap - s.enrolled;
+      if(remaining>0 && Math.random()<0.6) s.enrolled++;
+      else if(remaining<=0 && waitlisted[s.id] && Math.random()<0.4){
+        s.enrolled = Math.max(0,s.enrolled-1); delete waitlisted[s.id];
+        var course = courses.find(function(c){ return c.sections.indexOf(s)!==-1; });
+        selected[s.id] = {course:course, section:s}; s.enrolled++;
+        toast("Yer açıldı! "+course.code+" bekleme listesinden otomatik kaydedildin.","good");
+      } else if(remaining>0 && remaining<s.cap && Math.random()<0.15) s.enrolled = Math.max(0,s.enrolled-1);
+      renderAll();
+    }, 5000);
+  }
+  function stopDersKayitTimer(){ if(registrationTimer){ clearInterval(registrationTimer); registrationTimer=null; } }
+
+  // =====================================================================
+  // DERS PROGRAMI (finalized read-only schedule — real Güz 2026 data)
+  // =====================================================================
+  var confirmedSchedule = [
+    {code:"EEE 3718", name:"Geri Besleme Sistemleri", instr:"Dr. Öğr. Üyesi Emrah Bıyık", room:"M528", type:"zorunlu", slots:slots([["Pzt","10:40","13:30"]])},
+    {code:"ME 3320", name:"Isı ve Kütle Transferi", instr:"Dr. Öğr. Üyesi Levent Bilir", room:"M113", type:"zorunlu", slots:slots([["Pzt","13:40","16:30"],["Cum","08:40","10:30"]])},
+    {code:"ME 2320", name:"Termodinamik (tekrar)", instr:"Prof. Dr. Nurdan Yıldırım", room:"M109 / M216", type:"zorunlu", slots:slots([["Sal","12:40","15:30"],["Per","12:40","14:30"]])},
+    {code:"ESE 4910", name:"Enerji Sistemleri Analizi", instr:"Dr. Öğr. Üyesi Selen Çekinir", room:"M534 / M109", type:"zorunlu", slots:slots([["Per","12:40","13:30"],["Cmt","12:40","16:30"]])},
+    {code:"ENGR 4451", name:"Mühendislik Uyg. İçin Üretken YZ", instr:"Doç. Dr. Orkun Karabaşoğlu", room:"M531", type:"secmeli", slots:slots([["Cum","11:40","14:30"]])}
+  ];
+  function renderDersProgrami(){
+    var cellMap = {};
+    confirmedSchedule.forEach(function(entry){
+      entry.slots.forEach(function(sl){
+        var startH = Math.floor(toMin(sl.start)/60), endH = Math.ceil(toMin(sl.end)/60);
+        for(var h=startH; h<endH; h++){ var key=sl.day+"-"+h; cellMap[key]=entry; }
+      });
+    });
+    var tbl = "<tr><th></th>" + DAYS.slice(0,6).map(function(d){return "<th>"+d+"</th>";}).join("") + "</tr>";
+    HOURS.forEach(function(h){
+      tbl += "<tr><td class='hour'>"+h+":00</td>";
+      DAYS.slice(0,6).forEach(function(d){
+        var e = cellMap[d+"-"+h];
+        tbl += e? ("<td><div class='slot "+e.type+"' style='font-size:10px;'>"+e.code+"</div></td>") : "<td></td>";
+      });
+      tbl += "</tr>";
+    });
+    var rows = confirmedSchedule.map(function(e){
+      return '<tr><td><b>'+e.code+'</b></td><td>'+e.name+'</td><td>'+e.instr+'</td><td>'+e.room+'</td>'+
+        '<td>'+e.slots.map(function(s){return s.day+" "+s.start+"-"+s.end;}).join(", ")+'</td></tr>';
+    }).join("");
+    return ''+
+    '<div class="pagehead"><div class="kicker">'+STU.program+' · 2026-2027 Güz</div><h1>Ders Programı'+improvedBadge()+'</h1>'+
+    '<p>Kesinleşmiş, canlı derse giden haftalık programın — gerçek Güz 2026 programınla birebir aynı, ama OBS\'teki gibi ayrı bir rapor sayfası değil.</p></div>'+
+    '<div class="data-card"><div class="grid-wrap"><table class="sched">'+tbl+'</table></div></div>'+
+    '<div class="data-card"><h3>Ders Listesi</h3><table class="datatable"><tr><th>Kod</th><th>Ders</th><th>Öğretim Elemanı</th><th>Yer</th><th>Zaman</th></tr>'+rows+'</table></div>';
+  }
+
+  // =====================================================================
+  // TRANSKRIPT — real semester data, identity masked, with search + stats
+  // =====================================================================
+  var transcript = [
+    {sem:"2021-2022 Transfer Dersler", dno:2.95, gno:2.95, akts:24, toplam:24, durum:"Başarılı", rows:[
+      ["AIT 1101","Atatürk İlkeleri ve İnkılap Tarihi I","B",2,6],
+      ["ESM 1103","Enerji Sistemleri Mühendisliğine Giriş","B",6,18],
+      ["FIZ 1301","Fizik I","B-",5,13.5],
+      ["KIM 1311","Kimya","B-",5,13.5],
+      ["TDL 1111","Türk Dili I","C",2,4],
+      ["YDI 1121","Yabancı Dil I","A",4,16]
+    ]},
+    {sem:"2022-2023 Güz", dno:0.22, gno:1.62, akts:23, toplam:47, durum:"Sınamalı", rows:[
+      ["MATH 1101","Analitik Muhakeme","F",6,0],
+      ["MATH 1131","Analiz I","F",7,0],
+      ["SE 1115","Programlamaya Giriş","F",6,0],
+      ["SOFL 1101","Akademik İngilizce I","D+",4,5.2]
+    ]},
+    {sem:"2023-2024 Güz", dno:0.29, gno:1.42, akts:31, toplam:82, durum:"Sınamalı", rows:[
+      ["HIST 1210","Atatürk İlkeleri ve İnkılap Tarihi II","B+",2,6.6],
+      ["MATH 2230","Mühendislikte Hesaplama Yöntemleri","F",6,0],
+      ["MATH 2263","Diferansiyel Denklemler ve Dinamik Sistemler","F",7,0],
+      ["ME 2310","Termodinamik","F",7,0],
+      ["PHYS 1122","Fizik II","F",7,0],
+      ["TURK 1210","Türk Dili II","D+",2,2.6]
+    ]},
+    {sem:"2024-2025 Bahar", dno:1.39, gno:1.60, akts:32, toplam:116, durum:"Sınamalı", rows:[
+      ["EEE 2280","Elektrik Devreleri ve Sistemleri","D",7,7],
+      ["ISG 9110","İş Sağlığı ve Güvenliği I","B+",2,6.6],
+      ["ISG 9210","İş Sağlığı ve Güvenliği II","A-",2,7.4],
+      ["MATH 2260","Mühendisler için Olasılık ve İstatistik","D",6,6],
+      ["MATH 2263","Diferansiyel Denklemler ve Dinamik Sistemler","C+",7,16.1],
+      ["PHYS 1122","Fizik II","F",7,0],
+      ["UFND 7010","Sosyal Sorumluluk","S",1,0]
+    ]},
+    {sem:"2025-2026 Güz", dno:1.40, gno:1.70, akts:35, toplam:139, durum:"Sınamalı", rows:[
+      ["EEE 3615","Elektromekanik Enerji Dönüşümü","D",6,6],
+      ["ENGR 3450","Proje Yönetimi","B-",5,13.5],
+      ["ESE 3260","Rüzgar Enerjisi Sistemleri","D+",4,5.2],
+      ["ESE 3504","Akıllı Enerji Sistemleri","C-",4,6.8],
+      ["ESE 4830","Staj","S",4,0],
+      ["MATH 2230","Mühendislikte Hesaplama Yöntemleri","C",6,12],
+      ["ME 2320","Termodinamik","F",6,0]
+    ]},
+    {sem:"2026-2027 Güz (devam ediyor)", dno:null, gno:1.80, akts:32, toplam:184, durum:"Devam ediyor", rows:[
+      ["EEE 3718","Geri Besleme Sistemleri","--",6,null],
+      ["ENGR 4451","Müh. Uyg. İçin Üretken Yapay Zeka","--",6,null],
+      ["ESE 4910","Enerji Sistemleri Analizi","--",8,null],
+      ["ME 2320","Termodinamik (tekrar)","--",6,null],
+      ["ME 3320","Isı ve Kütle Transferi","--",6,null]
+    ]}
+  ];
+  var transkriptSearch = "";
+  function renderTranskript(){
+    var allRows = 0, failCount = 0, best=null, worst=null;
+    transcript.forEach(function(s){
+      allRows += s.rows.length;
+      s.rows.forEach(function(r){ if(r[2]==="F") failCount++; });
+      if(s.dno!=null){ if(!best||s.dno>best.dno) best=s; if(!worst||s.dno<worst.dno) worst=s; }
+    });
+    var head = '<div class="pagehead"><div class="kicker">'+STU.program+'</div><h1>Transkript'+improvedBadge()+'</h1>'+
+      '<p>OBS\'teki transkriptin bir PDF dökümü — aranamaz, filtrelenemez, mobilde okunaksız. Burada aynı gerçek veriyle arama ve özet istatistikler var.</p></div>'+
+      '<div class="data-card">'+
+        '<input class="search" id="transkriptSearch" style="width:100%; margin-bottom:0;" placeholder="Ders kodu veya adı ara (ör. MATH, Termodinamik)...">'+
+        '<div class="insight-row">'+
+          '<div class="insight"><div class="lbl">Toplam ders</div><b>'+allRows+'</b></div>'+
+          '<div class="insight"><div class="lbl">Kalınan ders (F)</div><b style="color:var(--red)">'+failCount+'</b></div>'+
+          (best?'<div class="insight"><div class="lbl">En iyi dönem</div><b style="color:var(--green)">'+best.sem.split(" ")[0]+' '+best.sem.split(" ")[1]+' · '+best.dno.toFixed(2)+'</b></div>':'')+
+          (worst?'<div class="insight"><div class="lbl">En zor dönem</div><b style="color:var(--red)">'+worst.sem.split(" ")[0]+' '+worst.sem.split(" ")[1]+' · '+worst.dno.toFixed(2)+'</b></div>':'')+
+        '</div>'+
+      '</div>'+
+      '<div id="transkriptBody"></div>'+
+      '<div class="data-card"><div class="sub">'+STU.not_+'</div></div>';
+    setTimeout(function(){
+      var sb = document.getElementById("transkriptSearch");
+      sb.addEventListener("input", function(e){ transkriptSearch = e.target.value.toLowerCase(); renderTranskriptBody(); });
+      renderTranskriptBody();
+    }, 0);
+    return head;
+  }
+  function renderTranskriptBody(){
+    var body = document.getElementById("transkriptBody"); if(!body) return;
+    var html = "";
+    transcript.forEach(function(s){
+      var rows = s.rows.filter(function(r){
+        if(!transkriptSearch) return true;
+        return r[0].toLowerCase().indexOf(transkriptSearch)!==-1 || r[1].toLowerCase().indexOf(transkriptSearch)!==-1;
+      });
+      if(!rows.length) return;
+      var rowsHtml = rows.map(function(r){
+        var fail = r[2]==="F";
+        return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td class="'+(fail?"fail":"")+'">'+r[2]+'</td><td class="num">'+r[3]+'</td><td class="num">'+(r[4]==null?"—":r[4])+'</td></tr>';
+      }).join("");
+      html += '<div class="data-card"><h3>'+s.sem+'</h3>'+
+        '<div class="sub"><span class="badge-status '+(s.durum==="Başarılı"?"ok":(s.durum==="Devam ediyor"?"":"warn"))+'">'+s.durum+'</span> &nbsp; DNO: <b>'+(s.dno==null?"—":s.dno.toFixed(2))+'</b> &nbsp; GNO: <b>'+s.gno.toFixed(2)+'</b> &nbsp; Dönem AKTS: <b>'+s.akts+'</b> &nbsp; Toplam AKTS: <b>'+s.toplam+'</b></div>'+
+        '<table class="datatable"><tr><th>Kod</th><th>Ders</th><th>Not</th><th>AKTS</th><th>Puan</th></tr>'+rowsHtml+'</table></div>';
+    });
+    if(!html) html = '<div class="placeholder-card">Aramanla eşleşen ders bulunamadı.</div>';
+    body.innerHTML = html;
+  }
+
+  // =====================================================================
+  // NOT LİSTESİ — current-term courses, sortable
+  // =====================================================================
+  function renderNotListesi(){
+    var cur = transcript[transcript.length-1];
+    return '<div class="pagehead"><div class="kicker">'+STU.program+' · 2026-2027 Güz</div><h1>Not Listesi'+improvedBadge()+'</h1>'+
+      '<p>Bu dönem kayıtlı olduğun dersler. OBS\'teki gibi tek bir tablo yerine, AKTS\'e göre sıralanabilir.</p></div>'+
+      '<div class="data-card">'+
+        '<div class="toolbar" style="margin-bottom:10px;">'+
+          '<select class="sortsel" id="notSort"><option value="kod">Koda göre sırala</option><option value="akts">AKTS\'e göre sırala</option></select>'+
+        '</div>'+
+        '<div id="notBody"></div>'+
+      '</div>';
+  }
+  function initNotListesi(){
+    var cur = transcript[transcript.length-1];
+    var sel = document.getElementById("notSort");
+    function render(){
+      var rows = cur.rows.slice();
+      if(sel.value==="akts") rows.sort(function(a,b){ return b[3]-a[3]; });
+      else rows.sort(function(a,b){ return a[0].localeCompare(b[0]); });
+      document.getElementById("notBody").innerHTML = '<table class="datatable"><tr><th>Kod</th><th>Ders</th><th>AKTS</th><th>Durum</th></tr>'+
+        rows.map(function(r){ return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td class="num">'+r[3]+' AKTS</td><td><span class="badge-status">Devam ediyor</span></td></tr>'; }).join("")+
+        '</table>';
+    }
+    sel.addEventListener("change", render);
+    render();
+  }
+
+  // =====================================================================
+  // DÖNEM ORTALAMALARI — GNO trend chart with insights
+  // =====================================================================
+  function renderDonemOrtalamalari(){
+    var withDno = transcript.filter(function(s){ return s.dno!=null; });
+    var best = withDno.reduce(function(a,b){ return b.dno>a.dno?b:a; });
+    var worst = withDno.reduce(function(a,b){ return b.dno<a.dno?b:a; });
+    var trendUp = transcript[transcript.length-1].gno > transcript[transcript.length-2].gno;
+    var max = 4.0;
+    var bars = transcript.map(function(s){
+      var h = Math.max(4, (s.gno/max*120));
+      var cls = s===best?"best":(s===worst?"worst":"");
+      return '<div class="bar"><div class="fill '+cls+'" style="height:'+h+'px"><b>'+s.gno.toFixed(2)+'</b></div><div class="lbl">'+s.sem.replace(" (devam ediyor","").replace(")","")+'</div></div>';
+    }).join("");
+    return '<div class="pagehead"><div class="kicker">'+STU.program+'</div><h1>Dönem Ortalamaları'+improvedBadge()+'</h1>'+
+      '<p>OBS bunu düz bir rakam tablosu olarak gösterir. Burada trend grafiği ve otomatik yorum var.</p></div>'+
+      '<div class="data-card"><div class="gno-chart">'+bars+'</div>'+
+      '<div class="insight-row">'+
+        '<div class="insight"><div class="lbl">Güncel AGNO</div><b>'+STU.agno.toFixed(2)+'</b></div>'+
+        '<div class="insight"><div class="lbl">Toplam AKTS</div><b>'+STU.toplamAkts+' / '+STU.hedefAkts+'</b></div>'+
+        '<div class="insight"><div class="lbl">En iyi dönem</div><b style="color:var(--green)">'+best.sem.split(" (")[0]+'</b></div>'+
+        '<div class="insight"><div class="lbl">Genel eğilim</div><b style="color:'+(trendUp?"var(--green)":"var(--red)")+'">'+(trendUp?"↑ Yükseliyor":"↓ Düşüyor")+'</b></div>'+
+      '</div></div>';
+  }
+
+  // =====================================================================
+  // MÜFREDAT DURUM — graduation progress & roadmap (new page)
+  // =====================================================================
+  function renderMufredatDurum(){
+    var pct = Math.round(STU.toplamAkts/STU.hedefAkts*100);
+    var kalanAkts = STU.hedefAkts - STU.toplamAkts;
+    var tahminiDonem = Math.ceil(kalanAkts/30);
+    return '<div class="pagehead"><div class="kicker">'+STU.program+'</div><h1>Müfredat Durum'+improvedBadge()+'</h1>'+
+      '<p>OBS bunu onlarca satırlık dev bir tabloda, hiç özet olmadan gösterir. Burada tek bakışta mezuniyete ne kadar kaldığı var.</p></div>'+
+      '<div class="data-card">'+
+        '<h3>Mezuniyet İlerlemesi</h3>'+
+        '<div class="akts-bar" style="height:14px; margin-top:10px;"><div class="akts-fill" style="width:'+pct+'%"></div></div>'+
+        '<div class="insight-row">'+
+          '<div class="insight"><div class="lbl">Tamamlanan AKTS</div><b>'+STU.toplamAkts+' / '+STU.hedefAkts+' (%'+pct+')</b></div>'+
+          '<div class="insight"><div class="lbl">Kalan AKTS</div><b>'+kalanAkts+'</b></div>'+
+          '<div class="insight"><div class="lbl">Normal hızda tahmini</div><b>~'+tahminiDonem+' dönem</b></div>'+
+          '<div class="insight"><div class="lbl">Genel Not Ortalaması</div><b>'+STU.agno.toFixed(2)+'</b></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="data-card">'+
+        '<h3>Kredi Özeti</h3>'+
+        '<table class="datatable">'+
+          '<tr><td>Alınan Kredi</td><td class="num">'+STU.alinanKredi+'</td></tr>'+
+          '<tr><td>Başarılı Olunan Kredi</td><td class="num">'+STU.basariliKredi+'</td></tr>'+
+          '<tr><td>Başarılı Olunan AKTS</td><td class="num">'+STU.basariliAkts+'</td></tr>'+
+          '<tr><td>Alınan Toplam AKTS</td><td class="num">'+STU.toplamAkts+'</td></tr>'+
+        '</table>'+
+      '</div>'+
+      '<div class="banner info">ℹ️ Detaylı ders-ders müfredat eşleştirmesi için OBS\'teki "Müfredat Durum" tablosuna bakılabilir — burada amacımız o devasa tabloyu tek bakışta özetlemek.</div>';
+  }
+
+  // =====================================================================
+  // SINAV TAKVİMİ — exam calendar with conflict detection (new page)
+  // =====================================================================
+  var exams = [
+    {code:"EEE 3718", name:"Geri Besleme Sistemleri", date:"2026-12-28", time:"10:00", room:"M528", type:"Final"},
+    {code:"ME 3320", name:"Isı ve Kütle Transferi", date:"2026-12-29", time:"13:00", room:"M113", type:"Final"},
+    {code:"ME 2320", name:"Termodinamik (tekrar)", date:"2026-12-30", time:"10:00", room:"M109", type:"Final"},
+    {code:"ESE 4910", name:"Enerji Sistemleri Analizi", date:"2026-12-30", time:"10:00", room:"M534", type:"Final"},
+    {code:"ENGR 4451", name:"Müh. Uyg. İçin Üretken YZ", date:"2027-01-05", time:"14:00", room:"M531", type:"Final"}
+  ];
+  function renderSinavTakvimi(){
+    var sorted = exams.slice().sort(function(a,b){ return (a.date+a.time).localeCompare(b.date+b.time); });
+    var byKey = {};
+    sorted.forEach(function(e){ var k=e.date+"-"+e.time; if(!byKey[k]) byKey[k]=[]; byKey[k].push(e); });
+    var cards = sorted.map(function(e){
+      var k = e.date+"-"+e.time;
+      var conflict = byKey[k].length>1;
+      var d = new Date(e.date);
+      return '<div class="exam-card'+(conflict?" conflict":"")+'">'+
+        '<div class="exam-date">'+d.getDate()+'<span>'+d.toLocaleDateString("tr-TR",{month:"short"})+' '+e.time+'</span></div>'+
+        '<div class="exam-info"><div class="nm">'+e.code+' — '+e.name+(conflict?' <span class="badge-status warn">⚠ ÇAKIŞIYOR</span>':'')+'</div>'+
+        '<div class="mt">'+e.type+' sınavı · '+e.room+'</div></div>'+
+      '</div>';
+    }).join("");
+    return '<div class="pagehead"><div class="kicker">'+STU.program+' · 2026-2027 Güz</div><h1>Sınav Takvimi'+improvedBadge()+'</h1>'+
+      '<p>OBS\'te bu dönem için henüz sınav tarihi tanımlanmadı. Bölüm tarihleri girdiğinde, çakışma kontrolü otomatik çalışsın diye örnek verilerle gösteriyoruz.</p></div>'+
+      '<div class="banner amber">⚠️ Aşağıdaki tarihler <b>örnektir</b> — amaç, aynı gün/saate denk gelen iki sınavı OBS\'in asla yapmadığı şekilde otomatik işaretlemek.</div>'+
+      '<div class="data-card">'+cards+'</div>';
+  }
+
+  // =====================================================================
+  // DEVAMSIZLIK DURUMU — attendance risk cards (new page)
+  // =====================================================================
+  var attendance = [
+    {code:"EEE 3718", name:"Geri Besleme Sistemleri", weekly:5, used:0, muaf:false},
+    {code:"ME 3320", name:"Isı ve Kütle Transferi", weekly:5, used:0, muaf:false},
+    {code:"ME 2320", name:"Termodinamik (tekrar)", weekly:5, used:0, muaf:true},
+    {code:"ESE 4910", name:"Enerji Sistemleri Analizi", weekly:5, used:0, muaf:false},
+    {code:"ENGR 4451", name:"Müh. Uyg. İçin Üretken YZ", weekly:3, used:0, muaf:false}
+  ];
+  function renderDevamsizlik(){
+    var cards = attendance.map(function(a){
+      if(a.muaf){
+        return '<div class="att-card"><div class="att-top"><b>'+a.code+' — '+a.name+'</b><span class="badge-status ok">Devam zorunluluğu yok</span></div>'+
+          '<div style="font-size:12px; color:var(--muted);">Bu derste yoklama alınmıyor.</div></div>';
+      }
+      var limit = Math.round(a.weekly*14*0.3); // typical 30% absence ceiling over a 14-week term
+      var pct = Math.min(100, Math.round(a.used/limit*100));
+      var cls = pct>=85?"danger":(pct>=60?"warn":"");
+      return '<div class="att-card"><div class="att-top"><b>'+a.code+' — '+a.name+'</b><span>'+a.used+' / '+limit+' saat</span></div>'+
+        '<div class="att-bar"><div class="att-fill '+cls+'" style="width:'+pct+'%"></div></div>'+
+        '<div style="font-size:11.5px; color:var(--muted); margin-top:6px;">Haftalık ders yükü '+a.weekly+' saat · Henüz OBS\'te yoklama girişi yapılmadı, bu yüzden limit tavanın %30\'luk güvenli alanı gösteriliyor.</div></div>';
+    }).join("");
+    return '<div class="pagehead"><div class="kicker">'+STU.program+' · 2026-2027 Güz</div><h1>Devamsızlık Durumu'+improvedBadge()+'</h1>'+
+      '<p>OBS sadece "Yoklama Girişi Yapılmamış" yazıp geçiyor; kaç saat hakkın kaldığını hiç göstermiyor. Burada riskli dersler renkle öne çıkıyor.</p></div>'+
+      '<div class="data-card">'+cards+'</div>';
+  }
+
+  // =====================================================================
+  // AKADEMİK TAKVİM — real dates + live countdown (upgraded)
+  // =====================================================================
+  var calendar = [
+    ["Yeni Öğrenci Bilgi Toplama","01.01.2026","15.11.2026"],
+    ["Yeni Öğrenci Ders Kayıt","15.09.2026","09.10.2026"],
+    ["Yeni Öğrenci Danışman Onay","14.09.2026","09.10.2026"],
+    ["Ders Kayıt","14.09.2026","09.10.2026"],
+    ["Danışman Onay","14.09.2026","09.10.2026"],
+    ["Yeni Öğrenci Ders Ekle/Bırak","21.09.2026","09.10.2026"],
+    ["Yeni Öğrenci Ders Ekle/Bırak Onay","21.09.2026","09.10.2026"],
+    ["Ders Ekle/Bırak","21.09.2026","09.10.2026"],
+    ["Ders Ekle/Bırak Onay","21.09.2026","09.10.2026"],
+    ["Ara Sınav Not Giriş","21.09.2026","13.01.2027"],
+    ["Yarıyıl Sınavı Not Giriş","26.12.2026","13.01.2027"],
+    ["Yarıyıl Sınavı Notlarının Öğrenciye Yayınlanması","13.01.2027",""],
+    ["Harf Notlarının Öğrenciye Yayınlanması","13.01.2027",""],
+    ["Öğretim Elemanı Bologna Giriş","09.09.2026","29.09.2026"],
+    ["Danışman Not Giriş / Staj Not Giriş","21.09.2026","13.01.2027"]
+  ];
+  function renderAkademikTakvim(){
+    var withMeta = calendar.map(function(c){
+      var start = parseTR(c[1]), end = c[2]? parseTR(c[2]) : start;
+      var startDiff = dayDiff(start), endDiff = dayDiff(end);
+      var status, label;
+      if(endDiff<0){ status="past"; label="Geçti"; }
+      else if(startDiff<=0 && endDiff>=0){ status="now"; label=endDiff===0?"Son gün!":endDiff+" gün kaldı"; }
+      else if(startDiff<=10){ status="soon"; label=startDiff+" gün sonra başlıyor"; }
+      else { status="later"; label=startDiff+" gün sonra"; }
+      return {c:c, status:status, label:label, startDiff:startDiff};
+    });
+    withMeta.sort(function(a,b){ return a.startDiff-b.startDiff; });
+    var rows = withMeta.map(function(m){
+      var rowCls = m.status==="now"?"active-now":(m.status==="soon"?"soon":"");
+      return '<tr class="'+rowCls+'"><td>'+m.c[0]+'</td><td class="when">'+m.c[1]+'</td><td class="when">'+(m.c[2]||"—")+'</td>'+
+        '<td><span class="countdown-chip '+m.status+'">'+m.label+'</span></td></tr>';
+    }).join("");
+    return '<div class="pagehead"><div class="kicker">2026-2027 Güz</div><h1>Akademik Takvim'+improvedBadge()+'</h1>'+
+      '<p>OBS tarihleri düz bir liste olarak sıralar, hangisi yaklaşıyor hiç belli olmaz. Burada kalan gün sayısı otomatik hesaplanıyor ve yaklaşan tarihler öne alınıyor.</p></div>'+
+      '<div class="data-card"><table class="cal-table"><tr><th>Takvim Adı</th><th>Başlangıç</th><th>Bitiş</th><th>Durum</th></tr>'+rows+'</table></div>';
+  }
+
+  // =====================================================================
+  // DANIŞMAN — contact + approval status (upgraded)
+  // =====================================================================
+  function renderDanisman(){
+    return '<div class="pagehead"><div class="kicker">'+STU.program+'</div><h1>Danışman Bilgileri'+improvedBadge()+'</h1>'+
+      '<p>OBS sadece ismi gösterir; ulaşmanın bir yolu yok. Burada onay durumu ve randevu talebi var.</p></div>'+
+      '<div class="data-card">'+
+        '<h3>'+STU.danisman+'</h3>'+
+        '<div class="sub">'+STU.fakulte+' — '+STU.program+'</div>'+
+        '<table class="datatable">'+
+          '<tr><td>Unvan</td><td>Dr. Öğretim Üyesi</td></tr>'+
+          '<tr><td>Birim</td><td>'+STU.fakulte+'</td></tr>'+
+          '<tr><td>Bölüm</td><td>'+STU.program+'</td></tr>'+
+          '<tr><td>Danışmanlık Başlangıcı</td><td>'+STU.kayitTarihi+'</td></tr>'+
+          '<tr><td>Bu Dönem Ders Kayıt Onayı</td><td><span class="badge-status ok">'+STU.danismanOnay+'</span></td></tr>'+
+        '</table>'+
+        '<button class="pick-btn" style="margin-top:14px;" id="randevuBtn">📅 Randevu Talep Et</button>'+
+      '</div>';
+  }
+
+  // =====================================================================
+  // BAŞVURU İŞLEMLERİ / BELGE TALEBİ — lightweight status tracker (upgraded)
+  // =====================================================================
+  function renderBasvuruIslemleri(){
+    var items = [
+      ["📝","Kayıt Dondurma Başvurusu","Sağlık/mali/kişisel nedenle dönem dondurma","Başlatılmadı"],
+      ["🩺","Mazeret Sınavı Başvurusu","Girilemeyen sınav için mazeret talebi","Başlatılmadı"],
+      ["📚","Ek Sınav Başvurusu","Azami süre sonunda ek sınav hakkı","Başlatılmadı"],
+      ["🔁","Tek Ders Başvurusu","Mezuniyet için kalan tek ders sınavı","Başlatılmadı"],
+      ["🎓","Bütünleşik Yüksek Lisans Başvurusu","Lisans-yüksek lisans birleşik program","Başlatılmadı"]
+    ];
+    var rows = items.map(function(it){ return '<div class="req-tile"><div class="ic">'+it[0]+'</div><div><div class="tt">'+it[1]+'</div><div class="ts">'+it[2]+'</div></div><div class="st"><span class="badge-status">'+it[3]+'</span></div></div>'; }).join("");
+    return '<div class="pagehead"><div class="kicker">'+STU.program+'</div><h1>Başvuru İşlemleri'+improvedBadge()+'</h1>'+
+      '<p>OBS bu başvuruları ayrı ayrı, açıklamasız formlar olarak listeler. Burada ne işe yaradığı ve durumu tek bakışta görünüyor.</p></div>'+rows;
+  }
+  function renderBelgeTalebi(){
+    var items = [
+      ["📄","Öğrenci Belgesi","Aktif öğrencilik durumunu gösteren resmi belge","Hazır değil"],
+      ["📑","Transkript Çıktısı","Not dökümünün resmi onaylı çıktısı","Hazır değil"],
+      ["🪪","Öğrenci Kimlik Kartı Talebi","Kayıp/yeni kart basımı","Hazır değil"]
+    ];
+    var rows = items.map(function(it){ return '<div class="req-tile"><div class="ic">'+it[0]+'</div><div><div class="tt">'+it[1]+'</div><div class="ts">'+it[2]+'</div></div><div class="st"><span class="badge-status">'+it[3]+'</span></div></div>'; }).join("");
+    return '<div class="pagehead"><div class="kicker">'+STU.program+'</div><h1>Belge Talebi'+improvedBadge()+'</h1>'+
+      '<p>Sık istenen belgeler tek listede, kısa açıklamalarıyla.</p></div>'+rows;
+  }
+
+  // =====================================================================
+  // Generic OBS-identical placeholder (only used where nothing was changed)
+  // =====================================================================
+  function renderPlaceholder(label){
+    return '<div class="pagehead"><div class="kicker">OBS\'teki ile aynı</div><h1>'+label+'</h1>'+
+      '<p>Bu sayfada OBS+ kapsamında bir değişiklik yapılmadı — OBS\'teki hâliyle birebir aynı tutuldu.</p></div>'+
+      '<div class="placeholder-card"><div class="ic">📄</div>Bu ekran OBS\'teki "'+label+'" sayfasıyla birebir aynıdır, OBS+ prototipi burada ek bir şey sunmuyor.</div>';
+  }
+
+  // =====================================================================
+  // Clock
+  // =====================================================================
+  function tickClock(){ var el=document.getElementById("clock"); if(el) el.textContent = new Date().toLocaleTimeString("tr-TR"); }
+  tickClock(); setInterval(tickClock, 1000);
+
+  // =====================================================================
+  // Router
+  // =====================================================================
+  function route(){
+    var hash = location.hash.replace(/^#\/?/, "") || "anasayfa";
+    stopDersKayitTimer();
+    document.getElementById("topbarTitle").textContent = PAGE_TITLES[hash] || "Öğrenci Bilgi Sistemi";
+    renderSidebar(hash);
+    var content = document.getElementById("content");
+    switch(hash){
+      case "anasayfa": content.innerHTML = renderDashboard(); break;
+      case "ders-kayit": content.innerHTML = renderDersKayitShell(false); initDersKayit(); break;
+      case "ders-ekle-birak": content.innerHTML = renderDersKayitShell(true); initDersKayit(); break;
+      case "ders-programi": content.innerHTML = renderDersProgrami(); break;
+      case "transkript": content.innerHTML = renderTranskript(); break;
+      case "not-listesi": content.innerHTML = renderNotListesi(); initNotListesi(); break;
+      case "donem-ortalamalari": content.innerHTML = renderDonemOrtalamalari(); break;
+      case "mufredat-durum": content.innerHTML = renderMufredatDurum(); break;
+      case "sinav-takvimi": content.innerHTML = renderSinavTakvimi(); break;
+      case "devamsizlik": content.innerHTML = renderDevamsizlik(); break;
+      case "akademik-takvim": content.innerHTML = renderAkademikTakvim(); break;
+      case "danisman":
+        content.innerHTML = renderDanisman();
+        setTimeout(function(){
+          var b = document.getElementById("randevuBtn");
+          if(b) b.addEventListener("click", function(){ toast("Randevu talebin "+STU.danisman+"'a iletildi.","good"); });
+        }, 0);
+        break;
+      case "basvuru-islemleri": content.innerHTML = renderBasvuruIslemleri(); break;
+      case "belge-talebi": content.innerHTML = renderBelgeTalebi(); break;
+      default: content.innerHTML = renderPlaceholder(PAGE_TITLES[hash] || hash); break;
+    }
+    window.scrollTo(0,0);
+  }
+  window.addEventListener("hashchange", route);
+  route();
+
+})();
+</script>
+
+</body></html>
